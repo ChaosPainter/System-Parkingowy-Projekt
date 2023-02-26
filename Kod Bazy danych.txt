@@ -1,0 +1,176 @@
+-- Table: public.admini
+
+-- DROP TABLE IF EXISTS public.admini;
+
+CREATE TABLE IF NOT EXISTS public.admini
+(
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    imie character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    nazwisko character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    login character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    pass character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT "Admini_pkey" PRIMARY KEY (id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.admini
+    OWNER to postgres;
+
+-- Table: public.klienci
+
+-- DROP TABLE IF EXISTS public.klienci;
+
+CREATE TABLE IF NOT EXISTS public.klienci
+(
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    imie character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    nazwisko character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    login character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    pass character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    balance double precision NOT NULL DEFAULT 0,
+    CONSTRAINT "Klienci_pkey" PRIMARY KEY (id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.klienci
+    OWNER to postgres;
+-- Index: fki_fk_samochody
+
+-- DROP INDEX IF EXISTS public.fki_fk_samochody;
+
+CREATE INDEX IF NOT EXISTS fki_fk_samochody
+    ON public.klienci USING btree
+    (id ASC NULLS LAST)
+    TABLESPACE pg_default;
+
+
+
+-- Table: public.samochody
+
+-- DROP TABLE IF EXISTS public.samochody;
+
+CREATE TABLE IF NOT EXISTS public.samochody
+(
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    id_klienta integer NOT NULL,
+    marka character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    model character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    rejstracja character varying(15) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT pk_samochody PRIMARY KEY (id),
+    CONSTRAINT fk_klienci FOREIGN KEY (id_klienta)
+        REFERENCES public.klienci (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.samochody
+    OWNER to postgres;
+-- Index: fki_fk_klienci
+
+-- DROP INDEX IF EXISTS public.fki_fk_klienci;
+
+CREATE INDEX IF NOT EXISTS fki_fk_klienci
+    ON public.samochody USING btree
+    (id_klienta ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: fki_klienci
+
+-- DROP INDEX IF EXISTS public.fki_klienci;
+
+CREATE INDEX IF NOT EXISTS fki_klienci
+    ON public.samochody USING btree
+    (id_klienta ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: fki_klienci_fk
+
+-- DROP INDEX IF EXISTS public.fki_klienci_fk;
+
+CREATE INDEX IF NOT EXISTS fki_klienci_fk
+    ON public.samochody USING btree
+    (id_klienta ASC NULLS LAST)
+    TABLESPACE pg_default;
+
+
+-- Table: public.parkowania
+
+-- DROP TABLE IF EXISTS public.parkowania;
+
+CREATE TABLE IF NOT EXISTS public.parkowania
+(
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    id_samochodu integer NOT NULL,
+    id_miejsca integer NOT NULL,
+    enter_date character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    leave_date character varying(255) COLLATE pg_catalog."default",
+    CONSTRAINT "Parkowania_pkey" PRIMARY KEY (id),
+    CONSTRAINT fk_miejsca FOREIGN KEY (id_miejsca)
+        REFERENCES public.miejsca (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_samochody FOREIGN KEY (id_samochodu)
+        REFERENCES public.samochody (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.parkowania
+    OWNER to postgres;
+
+-- Table: public.miejsca
+
+-- DROP TABLE IF EXISTS public.miejsca;
+
+CREATE TABLE IF NOT EXISTS public.miejsca
+(
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    stan integer NOT NULL,
+    pietro integer NOT NULL,
+    CONSTRAINT "Miejsca_pkey" PRIMARY KEY (id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.miejsca
+    OWNER to postgres;
+
+
+ALTER TABLE IF EXISTS public.admini
+    ADD CONSTRAINT "Admini_pkey" PRIMARY KEY (id);
+
+ALTER TABLE IF EXISTS public.klienci
+    ADD CONSTRAINT "Klienci_pkey" PRIMARY KEY (id);
+
+ALTER TABLE IF EXISTS public.samochody
+    ADD CONSTRAINT pk_samochody PRIMARY KEY (id);
+
+ALTER TABLE IF EXISTS public.parkowania
+    ADD CONSTRAINT "Parkowania_pkey" PRIMARY KEY (id);
+
+ALTER TABLE IF EXISTS public.miejsca
+    ADD CONSTRAINT "Miejsca_pkey" PRIMARY KEY (id);
+
+ALTER TABLE IF EXISTS public.parkowania
+    ADD CONSTRAINT fk_miejsca FOREIGN KEY (id_miejsca)
+    REFERENCES public.miejsca (id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION;
+
+ALTER TABLE IF EXISTS public.parkowania
+    ADD CONSTRAINT fk_samochody FOREIGN KEY (id_samochodu)
+    REFERENCES public.samochody (id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION;
+
+ALTER TABLE IF EXISTS public.samochody
+    ADD CONSTRAINT fk_klienci FOREIGN KEY (id_klienta)
+    REFERENCES public.klienci (id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION;
+
+
