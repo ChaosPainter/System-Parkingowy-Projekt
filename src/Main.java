@@ -10,7 +10,7 @@ public class Main {
         int fl = -1;
         do
         {
-            System.out.println("Menu:");
+            System.out.println("\nMenu:");
             System.out.println("0.Zamknij program.");
             System.out.println("1.Zaloguj się.");
             fl= scin.nextInt();

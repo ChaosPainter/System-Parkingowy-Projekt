@@ -13,7 +13,7 @@ public class User {
         Scanner scin = new Scanner(System.in);
         int fl=-1;
         while (fl!=0) {
-            System.out.println("Menu użytkownika:");
+            System.out.println("\nMenu użytkownika:");
             System.out.println("0.Wyloguj się.");
             System.out.println("1.Sprzwdź wolne miejsca parkingowe.");
             System.out.println("2.Zaparkuj samochód.");

@@ -11,7 +11,7 @@ public class Admin {
         int fl=-1;
 
         while (fl!=0) {
-            System.out.println("Menu Administratora:");
+            System.out.println("\nMenu Administratora:");
             System.out.println("0.Wyloguj się.");
             System.out.println("1.Dodaj klienta.");//
             System.out.println("2.Usuń klienta.");//
