@@ -46,7 +46,8 @@ public class Admin {
                     break;
                 case 5:
                     System.out.println("Podaj id usuwanego pojazdu");
-                    delete_car(id);
+                    int id_c= scin.nextInt();
+                    delete_car(id_c);
                     break;
                 case 6:
                     parkuj();
@@ -242,7 +243,7 @@ public class Admin {
         DBExecutor.executeQuery("Update Miejsca set stan = 0 Where id="+String.valueOf(id_park)+";");
     }
 
-    private static void delete_car(int id) throws SQLException {
+    private static void delete_car(int id) throws SQLException { //powinno usuwać zaparkowanie
         int fl=-1;
         ResultSet res=DBExecutor.executeSelect("Select * from samochody where id="+String.valueOf(id)+";");
         while (res.next())
@@ -300,12 +301,14 @@ public class Admin {
         Scanner scin = new Scanner(System.in);
         System.out.println("Podaj id właściciela");
         int own_id =  scin.nextInt();
+        System.out.println("Podaj rejstracje");
+        scin.nextLine();
+        String rejstracja = scin.nextLine().trim();
         System.out.println("Podaj markę");
         String marka = scin.next();
         System.out.println("Podaj model");
         String model = scin.next();
-        System.out.println("Podaj rejstracje");
-        String rejstracja = scin.nextLine().trim();
+
 
         int fl=-1;
         ResultSet res=DBExecutor.executeSelect("Select * from samochody where rejstracja='"+rejstracja+"';");
@@ -355,7 +358,7 @@ public class Admin {
         System.out.println("Dodano użytkownika.");
 
     }
-    public static void remove_client(int id) throws SQLException {
+    public static void remove_client(int id) throws SQLException { //powinno jeszcze usuwać samochód i zaparkowanie.
         int fl=-1;
         ResultSet res=DBExecutor.executeSelect("Select * from klienci where id="+String.valueOf(id)+";");
         while (res.next())
@@ -369,6 +372,7 @@ public class Admin {
         }
         String id_string = String.valueOf(id);
         DBExecutor.executeQuery("Delete From Klienci Where id="+id_string);
+
         System.out.println("Usunięto uzytkownika.");
     }
 

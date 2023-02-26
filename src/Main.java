@@ -13,8 +13,7 @@ public class Main {
             System.out.println("Menu:");
             System.out.println("0.Zamknij program.");
             System.out.println("1.Zaloguj się.");
-            fl= scin.nextInt();;
-
+            fl= scin.nextInt();
             if (fl==1)
             {
                 System.out.println("Podaj login.");

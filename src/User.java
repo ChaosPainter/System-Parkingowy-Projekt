@@ -51,6 +51,7 @@ public class User {
     private static void znajdz(int id) throws SQLException {
         System.out.println("Podaj numer rejscracyjny pojazdu");
         Scanner scin = new Scanner(System.in);
+        //scin.nextLine();
         String rej = scin.nextLine().trim();
 
         int fl=-1;
@@ -97,6 +98,7 @@ public class User {
     private static void wyparkuj(int id) throws SQLException {
         System.out.println("Podaj numer rejstracyjny pojazdu");
         Scanner scin = new Scanner(System.in);
+        //scin.nextLine();
         String rej = scin.nextLine().trim();
 
 
@@ -167,6 +169,7 @@ public class User {
     private static void zaparkuj(int id) throws SQLException {
         System.out.println("Podaj numer rejscracyjny pojazdu");
         Scanner scin = new Scanner(System.in);
+        //scin.nextLine();
         String rej = scin.nextLine().trim();
 
         int id_sam=-1;
@@ -215,7 +218,7 @@ public class User {
            pietro=res2.getInt("pietro");
         }
         if (id_miejsca!=-1){
-            System.out.println("Zaparkuj samochud na miejscu "+String.valueOf(id_miejsca)+" na poziomie "+String.valueOf(pietro));
+            System.out.println("Zaparkuj samochód na miejscu "+String.valueOf(id_miejsca)+" na poziomie "+String.valueOf(pietro));
             DBExecutor.executeQuery("Update Miejsca set stan=0 where id="+String.valueOf(id_miejsca));
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             LocalDateTime now = LocalDateTime.now();
