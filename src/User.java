@@ -35,11 +35,13 @@ public class User {
     }
 
     private static void sprawdz_balance(int id) throws SQLException {
-        ResultSet res=DBExecutor.executeSelect("Select balance from Klienci where id="+String.valueOf(id));
+
+        //nie trzeba sprawdzać czy użytkownik istnieje bo id nie jest wprowadzane ręcznie
+        ResultSet res1=DBExecutor.executeSelect("Select balance from Klienci where id="+String.valueOf(id));
         double balance=-1;
-        while(res.next())
+        while(res1.next())
         {
-             balance = res.getDouble("balance");
+             balance = res1.getDouble("balance");
         }
 
         System.out.println("Twoja należność to "+String.valueOf(balance)+" pln");
@@ -50,6 +52,19 @@ public class User {
         System.out.println("Podaj numer rejscracyjny pojazdu");
         Scanner scin = new Scanner(System.in);
         String rej = scin.nextLine().trim();
+
+        int fl=-1;
+        ResultSet res=DBExecutor.executeSelect("Select * from samochody where id_klienta="+String.valueOf(id)+" and rejstracja='"+rej+"';");
+        while (res.next())
+        {
+            fl=1;
+        }
+        if (fl==-1)
+        {
+            System.out.println("Samochód o podanym numerze rejstracyjnym nie należy do ciebie");
+            return;
+        }
+
         int id_sam = -1;
         ResultSet res_sam = DBExecutor.executeSelect("Select id from Samochody where rejstracja='"+rej+"'");
         while (res_sam.next()) {
@@ -79,10 +94,13 @@ public class User {
 
     }
 
-    private static void wyparkuj(int id) throws SQLException { // dokończ
-        System.out.println("Podaj numer rejscracyjny pojazdu");
+    private static void wyparkuj(int id) throws SQLException {
+        System.out.println("Podaj numer rejstracyjny pojazdu");
         Scanner scin = new Scanner(System.in);
         String rej = scin.nextLine().trim();
+
+
+
         int id_sam=-1;
         ResultSet res_sam=DBExecutor.executeSelect("Select id from Samochody where rejstracja='"+rej+"'");
         while(res_sam.next())
@@ -91,7 +109,19 @@ public class User {
         }
         if (id_sam==-1)
         {
-            System.out.println("samochód nie istnieje");
+            System.out.println("Samochód nie istnieje.");
+            return;
+        }
+
+        int fl=-1;
+        ResultSet res=DBExecutor.executeSelect("Select * from samochody where id_klienta="+String.valueOf(id)+" and rejstracja='"+rej+"';");
+        while (res.next())
+        {
+            fl=1;
+        }
+        if (fl==-1)
+        {
+            System.out.println("Samochód o podanym numerze rejstracyjnym nie należy do ciebie");
             return;
         }
 
@@ -111,7 +141,7 @@ public class User {
             System.out.println("Samochód nie jest zaparkowany");
             return;
         }
-         DBExecutor.executeQuery("Update Miejsca set stan=1 where id="+String.valueOf(id_miejsca));
+         DBExecutor.executeQuery("Update miejsca set stan=1 where id="+String.valueOf(id_miejsca));
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
@@ -132,32 +162,49 @@ public class User {
         }
 
         DBExecutor.executeQuery("update Klienci set balance=balance+"+String.valueOf(hours*3)+" Where id="+String.valueOf(id_kli));
-
-
-
-
-
-
-
-
-
     }
 
-    private static void zaparkuj(int id) throws SQLException { /////sprawdzić czy taki samochud już jest zaparkowany w parkowaniach
+    private static void zaparkuj(int id) throws SQLException {
         System.out.println("Podaj numer rejscracyjny pojazdu");
         Scanner scin = new Scanner(System.in);
         String rej = scin.nextLine().trim();
+
         int id_sam=-1;
         ResultSet res_sam=DBExecutor.executeSelect("Select id from Samochody where rejstracja='"+rej+"'");
         while(res_sam.next())
         {
-         id_sam=res_sam.getInt("id");
+            id_sam=res_sam.getInt("id");
         }
         if (id_sam==-1)
         {
-            System.out.println("samochód nie istnieje");
+            System.out.println("Taki samochód nie istnieje");
             return;
         }
+
+        int fl=-1;
+        ResultSet res=DBExecutor.executeSelect("Select * from samochody where id_klienta="+String.valueOf(id)+" and rejstracja='"+rej+"';");
+        while (res.next())
+        {
+            fl=1;
+        }
+        if (fl==-1)
+        {
+            System.out.println("Samochód o podanym numerze rejstracyjnym nie należy do ciebie");
+            return;
+        }
+
+        int fl2=-1;
+        ResultSet res_join = DBExecutor.executeSelect("Select from parkowania where id_samochodu="+String.valueOf(id_sam)+" and leave_date is null");
+        while (res_join.next())
+        {
+            fl2=1;
+        }
+        if (fl2==1)
+        {
+            System.out.println("Samochód jest już zaparkowany.");
+            return;
+        }
+
         ResultSet res2= DBExecutor.executeSelect("Select id , pietro From Miejsca Where stan=1 order by id limit 1");
         int pietro=-1;
         int id_miejsca=-1;

@@ -110,10 +110,23 @@ public class Admin {
         }
     }
 
-    private static void opłata() {
+    private static void opłata() throws SQLException {
         Scanner scin = new Scanner(System.in);
         System.out.println("Podaj id klienta");
         int id_kl= scin.nextInt();
+
+        int fl=-1;
+        ResultSet res=DBExecutor.executeSelect("Select * from klienci where id="+String.valueOf(id_kl)+";");
+        while (res.next())
+        {
+            fl=1;
+        }
+        if (fl==-1)
+        {
+            System.out.println("Użytkownik o podanym id nie istnieje.");
+            return;
+        }
+
         System.out.println("Podaj kwotę");
         double kwota= scin.nextDouble();
         kwota=kwota*(-1);
@@ -148,6 +161,31 @@ public class Admin {
         Scanner scin = new Scanner(System.in);
         System.out.println("Podaj id pojazdu");
         int id_poj=scin.nextInt();
+
+        int fl=-1;
+        ResultSet res=DBExecutor.executeSelect("Select * from samochody where id="+String.valueOf(id_poj)+";");
+        while (res.next())
+        {
+            fl=1;
+        }
+        if (fl==-1)
+        {
+            System.out.println("Samochód o podanym id nie istnieje.");
+            return;
+        }
+
+        int fl2=-1;
+        ResultSet res2=DBExecutor.executeSelect("Select * from parkowania where id_samochodu="+String.valueOf(id_poj)+" AND leave_date is null;");
+        while (res2.next())
+        {
+            fl2=1;
+        }
+        if (fl2==-1)
+        {
+            System.out.println("Samochód o podanym id nie jest zaparkowany.");
+            return;
+        }
+
         ResultSet res7 = DBExecutor.executeSelect("Select id ,id_miejsca from Parkowania where id_samochodu='"+String.valueOf(id_poj)
                 +"' AND leave_date is NULL");
         int id_miejsca=-1;
@@ -164,10 +202,35 @@ public class Admin {
         DBExecutor.executeQuery("Update Parkowania set leave_date='"+data+"' where id="+String.valueOf(id_parkowania));
     }
 
-    private static void parkuj() {
+    private static void parkuj() throws SQLException {
         Scanner scin = new Scanner(System.in);
         System.out.println("Podaj id samochodu");
         int car_id= scin.nextInt();
+
+        int fl=-1;
+        ResultSet res=DBExecutor.executeSelect("Select * from samochody where id="+String.valueOf(car_id)+";");
+        while (res.next())
+        {
+            fl=1;
+        }
+        if (fl==-1)
+        {
+            System.out.println("Samochód o podanym id nie istnieje.");
+            return;
+        }
+
+        int fl2=-1;
+        ResultSet res2=DBExecutor.executeSelect("Select * from parkowania where id_samochodu="+String.valueOf(car_id)+" AND leave_date is null;");
+        while (res2.next())
+        {
+            fl2=1;
+        }
+        if (fl2==1)
+        {
+            System.out.println("Samochód o podanym id jest już zaparkowany.");
+            return;
+        }
+
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
         String data = now.format(dtf);
@@ -179,13 +242,22 @@ public class Admin {
         DBExecutor.executeQuery("Update Miejsca set stan = 0 Where id="+String.valueOf(id_park)+";");
     }
 
-    private static void delete_car(int id)
-    {
+    private static void delete_car(int id) throws SQLException {
+        int fl=-1;
+        ResultSet res=DBExecutor.executeSelect("Select * from samochody where id="+String.valueOf(id)+";");
+        while (res.next())
+        {
+            fl=1;
+        }
+        if (fl==-1)
+        {
+            System.out.println("Samochód o podanym id nie istnieje.");
+            return;
+        }
         DBExecutor.executeQuery("Delete From Samochody Where id="+String.valueOf(id));
     }
 
-    private static void update_client(int id)
-    {
+    private static void update_client(int id) throws SQLException {
         Scanner scin = new Scanner(System.in);
         System.out.println("Podaj Imie");
         String imie =  scin.next();
@@ -196,12 +268,35 @@ public class Admin {
         System.out.println("Podaj hasło");
         String password = scin.next();
 
+        int fl=-1;
+        ResultSet res=DBExecutor.executeSelect("Select * from klienci where id="+String.valueOf(id)+";");
+        while (res.next())
+        {
+            fl=1;
+        }
+        if (fl==-1)
+        {
+            System.out.println("Użytkownik o podanym id nie istnieje.");
+            return;
+        }
+
+        int fl2=-1;
+        ResultSet res2=DBExecutor.executeSelect("Select * from klienci where login='"+login+"';");
+        while (res2.next())
+        {
+            fl2=1;
+        }
+        if (fl2==1)
+        {
+            System.out.println("Użytkownik o podanym loginie już istnieje.");
+            return;
+        }
+
         DBExecutor.executeQuery("Update Klienci Set imie='"+imie+"',nazwisko='"+nazwisko+"',login='"+login+"',pass='"+password+"' Where id="+String.valueOf(id));
 
     }
 
-    private static void add_car()
-    {
+    private static void add_car() throws SQLException {
         Scanner scin = new Scanner(System.in);
         System.out.println("Podaj id właściciela");
         int own_id =  scin.nextInt();
@@ -211,6 +306,18 @@ public class Admin {
         String model = scin.next();
         System.out.println("Podaj rejstracje");
         String rejstracja = scin.nextLine().trim();
+
+        int fl=-1;
+        ResultSet res=DBExecutor.executeSelect("Select * from samochody where rejstracja='"+rejstracja+"';");
+        while (res.next())
+        {
+            fl=1;
+        }
+        if (fl==1)
+        {
+            System.out.println("Samochód o podanym numerze rejstracyjnym już istnieje");
+            return;
+        }
 
         DBExecutor.executeQuery("Insert Into Samochody (id_klienta, marka, model, rejstracja) Values " +
                 "("+String.valueOf(own_id)+",'"+marka+"','"+model+"','"+rejstracja+"')");
@@ -232,35 +339,37 @@ public class Admin {
 //        LocalDateTime now = LocalDateTime.now();
 //        String data = now.format(dtf);
         int fl=-1;
-        ResultSet res=DBExecutor.executeSelect("Select * form klienci where login='"+login+"';");
+        ResultSet res=DBExecutor.executeSelect("Select * from klienci where login='"+login+"';");
         while (res.next())
         {
             fl=1;
         }
         if (fl==1)
         {
-            System.out.println("Użytkownik o podanym loginie już istnieje");
+            System.out.println("Użytkownik o podanym loginie już istnieje.");
             return;
         }
 
         DBExecutor.executeQuery("Insert Into Klienci (imie,nazwisko, login,pass,balance) " +
                 "Values('"+imie+"','"+nazwisko+"','"+login+"','"+password+"',0)");
+        System.out.println("Dodano użytkownika.");
 
     }
     public static void remove_client(int id) throws SQLException {
         int fl=-1;
-        ResultSet res=DBExecutor.executeSelect("Select * form klienci where id="+String.valueOf(id)+";");
+        ResultSet res=DBExecutor.executeSelect("Select * from klienci where id="+String.valueOf(id)+";");
         while (res.next())
         {
             fl=1;
         }
         if (fl==-1)
         {
-            System.out.println("Użytkownik o podanym id nie istnieje");
+            System.out.println("Użytkownik o podanym id nie istnieje.");
             return;
         }
         String id_string = String.valueOf(id);
         DBExecutor.executeQuery("Delete From Klienci Where id="+id_string);
+        System.out.println("Usunięto uzytkownika.");
     }
 
 
